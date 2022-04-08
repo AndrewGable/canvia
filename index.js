@@ -6,6 +6,7 @@ import * as path from 'path';
 import 'dotenv/config';
 
 const API_URL = "https://prod.palacio.life/backend/api/v1";
+const ONE_HUNDRED_MEGABYTES = 100000000;
 
 /**
  * Uses username and password to authenticate against API to get a token
@@ -18,11 +19,11 @@ const API_URL = "https://prod.palacio.life/backend/api/v1";
 const authenticate = async (username, password) => {
     return axios.post(`${API_URL}/authenticate`, {email: username, password: password})
         .then((response) => {
-            console.info(`✅  Authenticated`);
+            console.log(`✅  Authenticated`);
             return response.data.token;
         })
         .catch((error) => {
-            console.error(`❌  Error: Unknown error authenticating ${error}`);
+            console.log(`❌  Error: Unknown error authenticating ${error}`);
         })
 }
 
@@ -46,16 +47,16 @@ const createArtworkID = (token, imagePath) => {
 
     return axios.post(`${API_URL}/artworks`, body, {headers: {"x-access-token": token}})
         .then((response) => {
-            console.info(`✅  Created Artwork ID: ${response.data.id}`);
+            console.log(`✅  Created Artwork ID: ${response.data.id}`);
             return {token: token, artworkID: response.data.id};
         })
         .catch((error) => {
             if (error.response && error.response.status === 409) {
-                console.error(`❌  Error: Couldn't create artwork, please provide a unique file name.`)
+                console.log(`❌  Error: Couldn't create artwork, please provide a unique file name.`)
                 return;
             }
 
-            console.error(`❌  Error: Unknown error creating artwork ID ${error}`);
+            console.log(`❌  Error: Unknown error creating artwork ID ${error}`);
         })
 }
 
@@ -77,6 +78,8 @@ const upload = (username, token, artworkID, imagePath) => {
     const formHeaders = form.getHeaders();
 
     return axios.post(`${API_URL}/uploads/upload_artwork_image`, form, {
+        maxContentLength: ONE_HUNDRED_MEGABYTES,
+        maxBodyLength: ONE_HUNDRED_MEGABYTES,
         headers: {
             "x-access-token": token,
             "x-user-id": username,
@@ -84,11 +87,11 @@ const upload = (username, token, artworkID, imagePath) => {
         }
     })
         .then((response) => {
-            console.info(`✅  Uploaded image: ${response.data.artwork} ${imagePath}`)
+            console.log(`✅  Uploaded image: ${response.data.artwork} ${imagePath}`)
             return {token: token, artworkID: artworkID}
         })
         .catch((error) => {
-            console.error(`❌  Error: Unknown error uploading photo ${error}`);
+            console.log(`❌  Error: Unknown error uploading photo ${error}`);
         })
 }
 
@@ -115,22 +118,22 @@ const addToPlaylist = (username, token, artworkID, playlistID) => {
         }
     })
         .then((response) => {
-            console.info(`✅  Added to playlist`);
+            console.log(`✅  Added to playlist`);
         })
         .catch((error) => {
-            console.error(`❌  Error: Unknown error adding to playlist ${error}`);
+            console.log(`❌  Error: Unknown error adding to playlist ${error}`);
         })
 }
 
 // Check that correct number of parameters were provided
 if (process.argv.length !== 3) {
-    console.error(`Provide three arguments: node index.js /full/path/to/image.jpg`);
+    console.log(`Provide three arguments: node index.js /full/path/to/image.jpg`);
     process.exit(1);
 }
 
 // Check that the .env file is filled out correctly
 if (!process.env.USERNAME || !process.env.PASSWORD || !process.env.PLAYLIST) {
-    console.error(`Please create an .env file with USERNAME, PASSWORD, and PLAYLIST. See README.md for more details.`);
+    console.log(`Please create an .env file with USERNAME, PASSWORD, and PLAYLIST. See README.md for more details.`);
     process.exit(1);
 }
 
@@ -145,4 +148,4 @@ authenticate(process.env.USERNAME, process.env.PASSWORD)
     .then(token => createArtworkID(token, process.argv[2]))
     .then(({token, artworkID}) => upload(process.env.USERNAME, token, artworkID, process.argv[2]))
     .then(({token, artworkID}) => addToPlaylist(process.env.USERNAME, token, artworkID, process.env.PLAYLIST))
-    .catch(() => console.error(`❗ ️Unable to upload image, please see errors above.`));
+    .catch(() => console.log(`❗ ️Unable to upload image, please see errors above.`));
