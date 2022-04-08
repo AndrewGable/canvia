@@ -13,6 +13,3 @@ Upload images to [Canvia](https://canvia.art/) Smart Art Frame via NodeJS
 
 ### Known errors
 1. You cannot upload duplicate artwork names (e.g. `italy.jpg` twice), if you do the API will throw a `409` error.
-
-
-

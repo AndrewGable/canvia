@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { v4 as uuid } from 'uuid';
-import { default as FormData } from 'form-data';
+import {v4 as uuid} from 'uuid';
+import {default as FormData} from 'form-data';
 import * as fs from 'fs';
 import * as path from 'path';
 import 'dotenv/config';
@@ -17,13 +17,13 @@ const API_URL = "https://prod.palacio.life/backend/api/v1";
  */
 const authenticate = async (username, password) => {
     return axios.post(`${API_URL}/authenticate`, {email: username, password: password})
-    .then((response) => {
-        console.info(`✅  Authenticated`);
-        return response.data.token;
-    })
-    .catch((error) => {
-        console.error(`❌  Error: Unknown error authenticating ${error}`);
-    })
+        .then((response) => {
+            console.info(`✅  Authenticated`);
+            return response.data.token;
+        })
+        .catch((error) => {
+            console.error(`❌  Error: Unknown error authenticating ${error}`);
+        })
 }
 
 /**
@@ -45,18 +45,18 @@ const createArtworkID = (token, imagePath) => {
     }
 
     return axios.post(`${API_URL}/artworks`, body, {headers: {"x-access-token": token}})
-    .then((response) => {
-        console.info(`✅  Created Artwork ID: ${response.data.id}`);
-        return {token: token, artworkID: response.data.id};
-    })
-    .catch((error) => {
-        if (error.response && error.response.status === 409) {
-            console.error(`❌  Error: Couldn't create artwork, please provide a unique file name.`)
-            return;
-        }
+        .then((response) => {
+            console.info(`✅  Created Artwork ID: ${response.data.id}`);
+            return {token: token, artworkID: response.data.id};
+        })
+        .catch((error) => {
+            if (error.response && error.response.status === 409) {
+                console.error(`❌  Error: Couldn't create artwork, please provide a unique file name.`)
+                return;
+            }
 
-        console.error(`❌  Error: Unknown error creating artwork ID ${error}`);
-    })
+            console.error(`❌  Error: Unknown error creating artwork ID ${error}`);
+        })
 }
 
 /**
@@ -83,13 +83,13 @@ const upload = (username, token, artworkID, imagePath) => {
             ...formHeaders
         }
     })
-    .then((response) => {
-        console.info(`✅  Uploaded image: ${response.data.artwork} ${imagePath}`)
-        return {token: token, artworkID: artworkID}
-    })
-    .catch((error) => {
-        console.error(`❌  Error: Unknown error uploading photo ${error}`);
-    })
+        .then((response) => {
+            console.info(`✅  Uploaded image: ${response.data.artwork} ${imagePath}`)
+            return {token: token, artworkID: artworkID}
+        })
+        .catch((error) => {
+            console.error(`❌  Error: Unknown error uploading photo ${error}`);
+        })
 }
 
 /**
@@ -114,12 +114,12 @@ const addToPlaylist = (username, token, artworkID, playlistID) => {
             "x-user-id": username,
         }
     })
-    .then((response) => {
-        console.info(`✅  Added to playlist`);
-    })
-    .catch((error) => {
-        console.error(`❌  Error: Unknown error adding to playlist ${error}`);
-    })
+        .then((response) => {
+            console.info(`✅  Added to playlist`);
+        })
+        .catch((error) => {
+            console.error(`❌  Error: Unknown error adding to playlist ${error}`);
+        })
 }
 
 // Check that correct number of parameters were provided
@@ -144,4 +144,5 @@ if (!process.env.USERNAME || !process.env.PASSWORD || !process.env.PLAYLIST) {
 authenticate(process.env.USERNAME, process.env.PASSWORD)
     .then(token => createArtworkID(token, process.argv[2]))
     .then(({token, artworkID}) => upload(process.env.USERNAME, token, artworkID, process.argv[2]))
-    .then(({token, artworkID}) => addToPlaylist(process.env.USERNAME, token, artworkID, process.env.PLAYLIST));
+    .then(({token, artworkID}) => addToPlaylist(process.env.USERNAME, token, artworkID, process.env.PLAYLIST))
+    .catch(() => console.error(`❗ ️Unable to upload image, please see errors above.`));

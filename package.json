@@ -1,15 +1,11 @@
 {
   "name": "canvia",
   "version": "1.0.0",
-  "description": "",
+  "description": "Upload images to [Canvia](https://canvia.art/) Smart Art Frame via NodeJS",
   "main": "index.js",
   "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Andrew Gable",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.26.1",
     "dotenv": "^16.0.0",
