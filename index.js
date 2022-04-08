@@ -137,15 +137,22 @@ if (!process.env.USERNAME || !process.env.PASSWORD || !process.env.PLAYLIST) {
     process.exit(1);
 }
 
-/**
- * Order of operations:
- * 1. Authenticate via Canvia API to get `token`
- * 2. Create an `artworkID`
- * 3. Use the `artworkID` to upload local image
- * 4. Add the `artworkID` to a playlist
- */
-authenticate(process.env.USERNAME, process.env.PASSWORD)
-    .then(token => createArtworkID(token, process.argv[2]))
-    .then(({token, artworkID}) => upload(process.env.USERNAME, token, artworkID, process.argv[2]))
-    .then(({token, artworkID}) => addToPlaylist(process.env.USERNAME, token, artworkID, process.env.PLAYLIST))
-    .catch(() => console.log(`❗ ️Unable to upload image, please see errors above.`));
+// Image Paths are provided in a comma seperated string
+// e.g. "path/one.jpg,path/two.jpg"
+const imagePaths = process.argv[2];
+
+// For each image path and upload them to the API
+imagePaths.split(/\s*,\s*/).forEach(function(imagePath) {
+    /**
+     * Order of operations:
+     * 1. Authenticate via Canvia API to get `token`
+     * 2. Create an `artworkID`s
+     * 3. Use the `artworkID` to upload local image
+     * 4. Add the `artworkID` to a playlist
+     */
+    return authenticate(process.env.USERNAME, process.env.PASSWORD)
+        .then(token => createArtworkID(token, imagePath))
+        .then(({token, artworkID}) => upload(process.env.USERNAME, token, artworkID, imagePath))
+        .then(({token, artworkID}) => addToPlaylist(process.env.USERNAME, token, artworkID, process.env.PLAYLIST))
+        .catch(() => console.log(`❗ ️Unable to upload image, please see errors above.`));
+});
