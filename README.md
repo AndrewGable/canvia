@@ -9,7 +9,7 @@ Upload images to [Canvia](https://canvia.art/) Smart Art Frame via NodeJS
    1. `USERNAME` is your https://my.canvia.art username
    2. `PASSWORD` is your https://my.canvia.art password
    3. `PLAYLIST` is your https://my.canvia.art playlist ID
-4. `node index.js /full/path/to/image.jpg`
+4. Run the program with the full file path of the image to upload as the only parameter (`node index.js /full/path/to/image.jpg`)
 
 ### Known errors
 1. You cannot upload duplicate artwork names (e.g. `italy.jpg` twice), if you do the API will throw a `409` error.
